@@ -7,7 +7,8 @@ local uis = game:GetService("UserInputService")
 local GhostLib = {
 	Functions = {},
 	States = {},
-	Pages = {}
+	Pages = {},
+	Notifications = {}
 }
 
 local prefix = "."
@@ -84,38 +85,74 @@ CommandBox.TextWrapped = true
 GhostLib.States.CommandBarDelay = 0.2
 
 GhostLib.States.CommandBarVisible = false
+GhostLib.States.CommandBarCooldown = false
 function GhostLib.Functions:OpenCommandBar()
-	if GhostLib.States.CommandBarVisible == false then
+	if GhostLib.States.CommandBarVisible == false and GhostLib.States.CommandBarCooldown == false then
+		GhostLib.States.CommandBarCooldown = true
 		GhostLib.States.CommandBarVisible = true
 		CommandBar.Visible = true
 		local defpos = UDim2.new(0.5, 0,0.493, 0)
 		local leavepos = UDim2.new(0.5, 0,0.593, 0)
-
+		CommandBar.Position = leavepos
 		ts:Create(CommandBar, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {BackgroundTransparency = 0.9}):Play()
 		ts:Create(CommandBar, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {Position = defpos}):Play()
 		ts:Create(CommandBox, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {BackgroundTransparency = 0.85}):Play()
 		ts:Create(CommandBox, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {TextTransparency = 0}):Play()
-		wait(GhostLib.States.CommandBarDelay+0.1)
 		CommandBox:CaptureFocus()
+		wait(GhostLib.States.CommandBarDelay)
+		GhostLib.States.CommandBarCooldown = false
+		
 	end
 	
 end
-
-function GhostLib.Functions:MakeNotification()
-	
+-- {Text = Text, Frame = Message, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
+function GhostLib.Functions:MakeNotification(Text, Color)
+	task.spawn(function()
+		Color = Color or Color3.fromRGB(255, 255, 255)
+		local CloneNotification = true
+		local LastNotification = GhostLib.Notifications[#GhostLib.Notifications]
+		if LastNotification then
+			if LastNotification.Text == Text and LastNotification.DestroyTime > 0 then
+				CloneNotification = false
+				LastNotification.Times = LastNotification.Times + 1
+				LastNotification.DestroyTime = LastNotification.MaxDestroyTime + 1
+				LastNotification.Frame.pos0.Text = LastNotification.Text.." x"..LastNotification.Times
+			end
+		end
+		if CloneNotification == true then
+			local newNotification = NotificationFrame:Clone()
+			newNotification.pos0.Text = Text
+			newNotification.pos0.TextColor3 = Color
+			local MSG = {Text = Text, Frame = newNotification, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
+			table.insert(GhostLib.Notifications, MSG)
+			newNotification.Parent = Output
+			local pos2 = newNotification.pos0.Position
+			local pos1 = newNotification.pos1.Position
+			ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = pos1}):Play()
+			wait(1)
+			repeat wait()
+				MSG.DestroyTime = MSG.DestroyTime-1
+			until MSG.DestroyTime <= 0
+			ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.In), {Position = pos2}):Play()
+			wait(1.05)
+			newNotification:Destroy()
+		end
+	end)
 end
 function GhostLib.Functions:CloseCommandBar()
-	if GhostLib.States.CommandBarVisible == true then
+	if GhostLib.States.CommandBarVisible == true and GhostLib.States.CommandBarCooldown == false then
+		GhostLib.States.CommandBarCooldown = true
 		GhostLib.States.CommandBarVisible = false
 		local defpos = UDim2.new(0.5, 0,0.493, 0)
 		local leavepos = UDim2.new(0.5, 0,0.593, 0)
-
+		CommandBar.Position = defpos
 		ts:Create(CommandBar, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {BackgroundTransparency = 1}):Play()
 		ts:Create(CommandBar, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {Position = leavepos}):Play()
 		ts:Create(CommandBox, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {BackgroundTransparency = 1}):Play()
 		ts:Create(CommandBox, TweenInfo.new(GhostLib.States.CommandBarDelay, Enum.EasingStyle.Back), {TextTransparency = 1}):Play()
 		wait(GhostLib.States.CommandBarDelay)
 		CommandBar.Visible = false
+		GhostLib.States.CommandBarCooldown = false
 	end
 	
 end
@@ -154,7 +191,7 @@ Menu.Name = "Menu"
 Menu.Parent = ScreenGui
 Menu.AnchorPoint = Vector2.new(0.5, 0.5)
 Menu.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Menu.BackgroundTransparency = 0.25
+Menu.BackgroundTransparency = 0.1
 Menu.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Menu.Position = UDim2.new(0.510201097, 0, 0.752660453, 0)
 Menu.Size = UDim2.new(0, 309, 0, 200)
@@ -395,7 +432,7 @@ Button.BorderSizePixel = 0
 Button.Position = UDim2.new(0.0306748468, 0, -0.00499999989, 0)
 Button.Size = UDim2.new(0, 158, 0, 26)
 Button.Font = Enum.Font.DenkOne
-Button.Text = "Let me in your world"
+Button.Text = ""
 Button.TextColor3 = Color3.fromRGB(255, 255, 255)
 Button.TextSize = 14.000
 Button.AutomaticSize = Enum.AutomaticSize.Y
@@ -430,12 +467,13 @@ pos0.BackgroundTransparency = 1.000
 pos0.Position = UDim2.new(1.24637949, 0, 0.206994578, 0)
 pos0.Size = UDim2.new(0, 160, 0, 28)
 pos0.Font = Enum.Font.DenkOne
-pos0.Text = ".autorespawn/.auto <on/off>wdsaaaaaaaaaaaaaa"
+pos0.Text = ""
 pos0.TextColor3 = Color3.fromRGB(255, 255, 255)
-pos0.TextSize = 14.000
-pos0.TextStrokeTransparency = 0.730
+pos0.TextSize = 17.000
+pos0.TextStrokeTransparency = 0.2
 pos0.TextWrapped = true
 pos0.TextXAlignment = Enum.TextXAlignment.Left
+pos0.AutomaticSize = Enum.AutomaticSize.Y
 
 pos1.Name = "pos1"
 pos1.Parent = NotificationFrame
@@ -445,12 +483,13 @@ pos1.Position = UDim2.new(0.0418339968, 0, 0.206994578, 0)
 pos1.Size = UDim2.new(0, 160, 0, 28)
 pos1.Visible = false
 pos1.Font = Enum.Font.DenkOne
-pos1.Text = ".autorespawn/.auto <on/off>wdsaaaaaaaaaaaaaa"
+pos1.Text = ""
 pos1.TextColor3 = Color3.fromRGB(255, 255, 255)
-pos1.TextSize = 14.000
+pos1.TextSize = 17.000
 pos1.TextStrokeTransparency = 0.730
 pos1.TextWrapped = true
 pos1.TextXAlignment = Enum.TextXAlignment.Left
+pos1.AutomaticSize = Enum.AutomaticSize.Y
 
 ScriptTitle.Name = "ScriptTitle"
 ScriptTitle.Parent = Menu
@@ -496,15 +535,14 @@ end
 local tweenTimeButton = 0.3
 function GhostLib.Functions:RemoveRgb(frame)
 	coroutine.wrap(function()
-		print(frame.TextLabel.Text)
 		local child = frame:FindFirstChild("RGB")
 		if child then
 			child:Destroy()
-			for i,f in pairs(savedColors) do
-				if f[1] == frame then
-					frame.BackgroundColor3 = f[2]
-					table.remove(savedColors,i)
-				end
+		end
+		for i,f in pairs(savedColors) do
+			if f[1] == frame then
+				frame.BackgroundColor3 = f[2]
+				print(f[2])
 			end
 		end
 	end)()
@@ -515,7 +553,16 @@ end
 function GhostLib.Functions:Rgb(frame)
 	coroutine.wrap(function()
 		if not frame:FindFirstChild("RGB") then
-			table.insert(savedColors, {frame, frame.BackgroundColor3})
+			local found = false
+			for _,c in pairs(savedColors) do
+				if c[1] == frame then
+					found = true
+				end
+			end
+			if found == false then
+				table.insert(savedColors, {frame, frame.BackgroundColor3})
+			end
+			
 
 			local gradient = Instance.new("UIGradient")
 			gradient.Transparency = NumberSequence.new(1)
@@ -535,7 +582,7 @@ function GhostLib.Functions:Rgb(frame)
 				conn:Disconnect()
 			end)()
 
-			local an2 = ts:Create(frame, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)})
+			local an2 = ts:Create(frame, TweenInfo.new(0), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)})
 
 			an2:Play()
 			gradient.Name = "RGB"
@@ -769,12 +816,14 @@ function GhostLib.Functions:AddKeybind(tab, page)
 	local al = false
 	Nk.MouseButton1Down:Connect(function()
 		local conn1
+		GhostLib.Functions:Rgb(Nk)
 		conn1 = uis.InputBegan:Connect(function(i,p)
 			if not p then
 				if i.KeyCode ~= Enum.KeyCode.Unknown and al == false then
 					al = true
 					Key = i.KeyCode
 					Nk.Box.Text = Key.Name
+					GhostLib.Functions:RemoveRgb(Nk)
 					conn1:Disconnect()
 					
 					wait(0.5)
@@ -885,6 +934,7 @@ function GhostLib.Functions:AddSection(tab, page)
 	label.TextColor3 = Color 
 	label.Parent = page.Frame
 end
+
 local cmdPage = GhostLib.Functions:AddPage({
 	Name = "Commands",
 	Image = "http://www.roblox.com/asset/?id=12338394619"
@@ -899,6 +949,14 @@ GhostLib.Functions:AddKeybind({
 		elseif GhostLib.States.CommandBarVisible == false then
 			GhostLib.Functions:OpenCommandBar()
 		end
+	end,
+},cmdPage)
+
+GhostLib.Functions:AddKeybind({
+	Key = Enum.KeyCode.K,
+	Text = "Open menu",
+	CallBack = function()
+		Menu.Visible = not Menu.Visible
 	end,
 },cmdPage)
 
@@ -1049,6 +1107,10 @@ GhostLib.Functions:AddCommand({Names = {"changeprefix", "prefix", "pfx"}, Descri
 	end
 end})
 
+GhostLib.Functions:AddCommand({Names = {"rj", "rejoin"}, Description = {"string"}, Funct = function(args)
+	game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+end})
+
 GhostLib.Functions:DisplayPage(GhostLib.Pages[1])
 
 CommandBox.FocusLost:Connect(function(enter)
@@ -1059,6 +1121,11 @@ CommandBox.FocusLost:Connect(function(enter)
 	
 	GhostLib.Functions:CloseCommandBar()
 end)
+
+function GhostLib.Functions:SetScriptName(Str)
+	ScriptTitle.Text = Str or "GHXST ADMIN"
+end
+
 return GhostLib
 
 
