@@ -780,7 +780,7 @@ function GhostLib.Functions:AddTextBox(tab, page)
 		box.Box.FocusLost:connect(function(enter)
 			ts:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
 			if enter then
-				pcall(callBack, box.Text.Text)
+				pcall(callBack, box.Box.Text)
 				if ClearTextOnEnter == true then
 					box.Box.Text = ""
 				end
