@@ -736,7 +736,7 @@ function GhostLib.Functions:DisplayPage(page)
                 if page1.Frame ~= Page then
                     GhostLib.Functions:RemoveRgb(page1.Button)
                     ts:Create(page1.Frame, TweenInfo.new(GhostLib.States.PageChangeTime, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0.443, 0,-1, 0)}):Play()
-                   
+                    wait(GhostLib.States.PageChangeTime+0.05)
                     page1.Frame.Parent = nil
                     page1.Position = GhostLib.States.DefaultPagePos
                 end
