@@ -783,6 +783,8 @@ function GhostLib.Functions:AddTextBox(tab, page)
 			end
 		end)
 	end
+    
+    return box.Box
 end
 function GhostLib.Functions:AddButton(tab, page)
 	local Text = tab.Text
