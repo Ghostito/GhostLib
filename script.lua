@@ -8,7 +8,8 @@ local GhostLib = {
 	Functions = {},
 	States = {},
 	Pages = {},
-	Notifications = {}
+	Notifications = {},
+	Started = false
 }
 
 local prefix = "."
@@ -87,7 +88,7 @@ GhostLib.States.CommandBarDelay = 0.2
 GhostLib.States.CommandBarVisible = false
 GhostLib.States.CommandBarCooldown = false
 function GhostLib.Functions:OpenCommandBar()
-	if GhostLib.States.CommandBarVisible == false and GhostLib.States.CommandBarCooldown == false then
+	if GhostLib.States.CommandBarVisible == false and GhostLib.States.CommandBarCooldown == false and GhostLib.Started == true then
 		GhostLib.States.CommandBarCooldown = true
 		GhostLib.States.CommandBarVisible = true
 		CommandBar.Visible = true
@@ -107,40 +108,43 @@ function GhostLib.Functions:OpenCommandBar()
 end
 -- {Text = Text, Frame = Message, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
 function GhostLib.Functions:MakeNotification(Text, Color)
-	task.spawn(function()
-		Color = Color or Color3.fromRGB(255, 255, 255)
-		local CloneNotification = true
-		local LastNotification = GhostLib.Notifications[#GhostLib.Notifications]
-		if LastNotification then
-			if LastNotification.Text == Text and LastNotification.DestroyTime > 0 then
-				CloneNotification = false
-				LastNotification.Times = LastNotification.Times + 1
-				LastNotification.DestroyTime = LastNotification.MaxDestroyTime + 1
-				LastNotification.Frame.pos0.Text = LastNotification.Text.." x"..LastNotification.Times
+	if GhostLib.Started == true then
+		task.spawn(function()
+			Color = Color or Color3.fromRGB(255, 255, 255)
+			local CloneNotification = true
+			local LastNotification = GhostLib.Notifications[#GhostLib.Notifications]
+			if LastNotification then
+				if LastNotification.Text == Text and LastNotification.DestroyTime > 0 then
+					CloneNotification = false
+					LastNotification.Times = LastNotification.Times + 1
+					LastNotification.DestroyTime = LastNotification.MaxDestroyTime + 1
+					LastNotification.Frame.pos0.Text = LastNotification.Text.." x"..LastNotification.Times
+				end
 			end
-		end
-		if CloneNotification == true then
-			local newNotification = NotificationFrame:Clone()
-			newNotification.pos0.Text = Text
-			newNotification.pos0.TextColor3 = Color
-			local MSG = {Text = Text, Frame = newNotification, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
-			table.insert(GhostLib.Notifications, MSG)
-			newNotification.Parent = Output
-			local pos2 = newNotification.pos0.Position
-			local pos1 = newNotification.pos1.Position
-			ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = pos1}):Play()
-			wait(1)
-			repeat wait()
-				MSG.DestroyTime = MSG.DestroyTime-1
-			until MSG.DestroyTime <= 0
-			ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.In), {Position = pos2}):Play()
-			wait(1.05)
-			newNotification:Destroy()
-		end
-	end)
+			if CloneNotification == true then
+				local newNotification = NotificationFrame:Clone()
+				newNotification.pos0.Text = Text
+				newNotification.pos0.TextColor3 = Color
+				local MSG = {Text = Text, Frame = newNotification, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
+				table.insert(GhostLib.Notifications, MSG)
+				newNotification.Parent = Output
+				local pos2 = newNotification.pos0.Position
+				local pos1 = newNotification.pos1.Position
+				ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = pos1}):Play()
+				wait(1)
+				repeat wait()
+					MSG.DestroyTime = MSG.DestroyTime-1
+				until MSG.DestroyTime <= 0
+				ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.In), {Position = pos2}):Play()
+				wait(1.05)
+				newNotification:Destroy()
+			end
+		end)
+	end
+	
 end
 function GhostLib.Functions:CloseCommandBar()
-	if GhostLib.States.CommandBarVisible == true and GhostLib.States.CommandBarCooldown == false then
+	if GhostLib.States.CommandBarVisible == true and GhostLib.States.CommandBarCooldown == false and GhostLib.Started == true then
 		GhostLib.States.CommandBarCooldown = true
 		GhostLib.States.CommandBarVisible = false
 		local defpos = UDim2.new(0.5, 0,0.493, 0)
@@ -196,7 +200,7 @@ Menu.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Menu.Position = UDim2.new(0.510201097, 0, 0.752660453, 0)
 Menu.Size = UDim2.new(0, 309, 0, 200)
 Menu.ClipsDescendants = true
-
+Menu.Visible = false
 
 PageChange.Name = "PageChange"
 PageChange.Parent = Menu
@@ -1032,69 +1036,72 @@ local function getcmdfunction(str)
 end
 
 local function execute_command(tab)
-	local str = tab.str
-	local method = tab.method or "bar"
-	
-	local args = {}
-	local pattern = "%S+"
+	if GhostLib.Started == true then
+		local str = tab.str
+		local method = tab.method or "bar"
 
-	for word in string.gmatch(str:lower(), pattern) do
-		table.insert(args, word)
-	end
-	for i,arg in pairs(args) do
-		if arg == "/e" then
-			table.remove(args, i)
-		elseif arg == "/w" then
-			table.remove(args, i)
-			table.remove(args, i)
-		end
-	end
-	local foundPrefix = false
-	local CommandsFound = {}
-	local CommandsTab = {}
-	
-	for index,arg in pairs(args) do
-		if string.sub(arg, 0,#prefix) == prefix then
-			arg = string.sub(arg,(#prefix+1),#arg)
-			args[index] = arg
-			foundPrefix = true
-			
-			table.insert(CommandsFound, arg)
-		elseif table.find(cmdNames, arg) and method == "bar" then
-			foundPrefix = true
+		local args = {}
+		local pattern = "%S+"
 
-			table.insert(CommandsFound, arg)
+		for word in string.gmatch(str:lower(), pattern) do
+			table.insert(args, word)
 		end
-	end
-	
-	if method == "chatted" and foundPrefix == false then
-		return nil
-	end
-	local Finished = 0
-	for index,arg in pairs(args) do
-		if table.find(CommandsFound,arg) then
-			Finished = Finished + 1
-			table.insert(CommandsTab, {arg})
-		elseif CommandsTab[Finished] then
-			table.insert(CommandsTab[Finished], arg)
-		end
-	end
-	local executed = 0
-	for i,cmd in pairs(CommandsTab) do
-		if typeof(cmd) == "table" then
-			local func = getcmdfunction(cmd[1])
-			if func then
-				executed = executed+1
-				local sucess, err = pcall(func, cmd)
-				if err then print(err) end
+		for i,arg in pairs(args) do
+			if arg == "/e" then
+				table.remove(args, i)
+			elseif arg == "/w" then
+				table.remove(args, i)
+				table.remove(args, i)
 			end
 		end
-		
-		
+		local foundPrefix = false
+		local CommandsFound = {}
+		local CommandsTab = {}
+
+		for index,arg in pairs(args) do
+			if string.sub(arg, 0,#prefix) == prefix then
+				arg = string.sub(arg,(#prefix+1),#arg)
+				args[index] = arg
+				foundPrefix = true
+
+				table.insert(CommandsFound, arg)
+			elseif table.find(cmdNames, arg) and method == "bar" then
+				foundPrefix = true
+
+				table.insert(CommandsFound, arg)
+			end
+		end
+
+		if method == "chatted" and foundPrefix == false then
+			return nil
+		end
+		local Finished = 0
+		for index,arg in pairs(args) do
+			if table.find(CommandsFound,arg) then
+				Finished = Finished + 1
+				table.insert(CommandsTab, {arg})
+			elseif CommandsTab[Finished] then
+				table.insert(CommandsTab[Finished], arg)
+			end
+		end
+		local executed = 0
+		for i,cmd in pairs(CommandsTab) do
+			if typeof(cmd) == "table" then
+				local func = getcmdfunction(cmd[1])
+				if func then
+					executed = executed+1
+					local sucess, err = pcall(func, cmd)
+					if err then print(err) end
+				end
+			end
+
+
+		end
+		if executed == 0 then
+			print("Commands not found")
+		end
 	end
-	if executed == 0 then
-		print("Commands not found")
-	end
+	
 	
 end
 lp.Chatted:connect(function(msg)
@@ -1126,6 +1133,16 @@ function GhostLib.Functions:SetScriptName(Str)
 	ScriptTitle.Text = Str or "GHXST ADMIN"
 end
 
+function GhostLib:Start()
+	GhostLib.Started = true
+end
+
+task.spawn(function()
+	repeat wait()
+		
+	until GhostLib.Started == true
+	Menu.Visible = true
+end)
 return GhostLib
 
 
