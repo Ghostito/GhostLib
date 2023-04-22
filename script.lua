@@ -124,6 +124,7 @@ function GhostLib.Functions:MakeNotification(Text, Color)
 			if CloneNotification == true then
 				local newNotification = NotificationFrame:Clone()
 				newNotification.pos0.Text = Text
+                newNotification.pos1.Text = Text
 				newNotification.pos0.TextColor3 = Color
 				local MSG = {Text = Text, Frame = newNotification, DestroyTime = 300, MaxDestroyTime = 300, Times = 1}
 				table.insert(GhostLib.Notifications, MSG)
@@ -475,7 +476,7 @@ pos0.Font = Enum.Font.DenkOne
 pos0.Text = ""
 pos0.TextColor3 = Color3.fromRGB(255, 255, 255)
 pos0.TextSize = 13.000
-pos0.TextStrokeTransparency = 0.2
+pos0.TextStrokeTransparency = 0.5
 pos0.TextWrapped = true
 pos0.TextXAlignment = Enum.TextXAlignment.Left
 pos0.AutomaticSize = Enum.AutomaticSize.Y
