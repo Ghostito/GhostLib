@@ -462,7 +462,8 @@ NotificationFrame.Name = "NotificationFrame"
 NotificationFrame.Parent = nil
 NotificationFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 NotificationFrame.BackgroundTransparency = 1.000
-NotificationFrame.Size = UDim2.new(0.978944302, 0, 0.16780822, 0)
+NotificationFrame.Size = UDim2.new(0.979, 0,0.005, 0)
+NotificationFrame.AutomaticSize = Enum.AutomaticSize.Y
 
 pos0.Name = "pos0"
 pos0.Parent = NotificationFrame
