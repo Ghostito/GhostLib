@@ -760,8 +760,8 @@ function GhostLib.Functions:AddTextBox(tab, page)
 	local Text = tab.Text
 	local Color = tab.Color or Color3.fromRGB(255, 255, 255)
 	local box = TextBox:Clone()
-	local ClearTextOnFocus = tab.ClearTextOnFocus or true
-	local ClearTextOnEnter = tab.ClearTextOnEnter or true
+	local ClearTextOnFocus = tab.ClearTextOnFocus
+	local ClearTextOnEnter = tab.ClearTextOnEnter
 	local callBack = tab.CallBack or nil
 	box.Text.Text = Text
 	box.Text.TextColor3 = Color
