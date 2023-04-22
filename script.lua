@@ -1036,71 +1036,74 @@ local function getcmdfunction(str)
 end
 
 local function execute_command(tab)
-	if GhostLib.Started == true then
-		local str = tab.str
-		local method = tab.method or "bar"
-
-		local args = {}
-		local pattern = "%S+"
-
-		for word in string.gmatch(str:lower(), pattern) do
-			table.insert(args, word)
-		end
-		for i,arg in pairs(args) do
-			if arg == "/e" then
-				table.remove(args, i)
-			elseif arg == "/w" then
-				table.remove(args, i)
-				table.remove(args, i)
-			end
-		end
-		local foundPrefix = false
-		local CommandsFound = {}
-		local CommandsTab = {}
-
-		for index,arg in pairs(args) do
-			if string.sub(arg, 0,#prefix) == prefix then
-				arg = string.sub(arg,(#prefix+1),#arg)
-				args[index] = arg
-				foundPrefix = true
-
-				table.insert(CommandsFound, arg)
-			elseif table.find(cmdNames, arg) and method == "bar" then
-				foundPrefix = true
-
-				table.insert(CommandsFound, arg)
-			end
-		end
-
-		if method == "chatted" and foundPrefix == false then
-			return nil
-		end
-		local Finished = 0
-		for index,arg in pairs(args) do
-			if table.find(CommandsFound,arg) then
-				Finished = Finished + 1
-				table.insert(CommandsTab, {arg})
-			elseif CommandsTab[Finished] then
-				table.insert(CommandsTab[Finished], arg)
-			end
-		end
-		local executed = 0
-		for i,cmd in pairs(CommandsTab) do
-			if typeof(cmd) == "table" then
-				local func = getcmdfunction(cmd[1])
-				if func then
-					executed = executed+1
-					local sucess, err = pcall(func, cmd)
-					if err then print(err) end
-				end
-			end
-
-
-		end
-		if executed == 0 then
-			print("Commands not found")
-		end
-	end
+    task.spawn(function()
+        if GhostLib.Started == true then
+            local str = tab.str
+            local method = tab.method or "bar"
+    
+            local args = {}
+            local pattern = "%S+"
+    
+            for word in string.gmatch(str:lower(), pattern) do
+                table.insert(args, word)
+            end
+            for i,arg in pairs(args) do
+                if arg == "/e" then
+                    table.remove(args, i)
+                elseif arg == "/w" then
+                    table.remove(args, i)
+                    table.remove(args, i)
+                end
+            end
+            local foundPrefix = false
+            local CommandsFound = {}
+            local CommandsTab = {}
+    
+            for index,arg in pairs(args) do
+                if string.sub(arg, 0,#prefix) == prefix then
+                    arg = string.sub(arg,(#prefix+1),#arg)
+                    args[index] = arg
+                    foundPrefix = true
+    
+                    table.insert(CommandsFound, arg)
+                elseif table.find(cmdNames, arg) and method == "bar" then
+                    foundPrefix = true
+    
+                    table.insert(CommandsFound, arg)
+                end
+            end
+    
+            if method == "chatted" and foundPrefix == false then
+                return nil
+            end
+            local Finished = 0
+            for index,arg in pairs(args) do
+                if table.find(CommandsFound,arg) then
+                    Finished = Finished + 1
+                    table.insert(CommandsTab, {arg})
+                elseif CommandsTab[Finished] then
+                    table.insert(CommandsTab[Finished], arg)
+                end
+            end
+            local executed = 0
+            for i,cmd in pairs(CommandsTab) do
+                if typeof(cmd) == "table" then
+                    local func = getcmdfunction(cmd[1])
+                    if func then
+                        executed = executed+1
+                        local sucess, err = pcall(func, cmd)
+                        if err then print(err) end
+                    end
+                end
+    
+    
+            end
+            if executed == 0 then
+                print("Commands not found")
+            end
+        end
+    end)
+	
 	
 	
 end
