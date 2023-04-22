@@ -732,16 +732,20 @@ function GhostLib.Functions:DisplayPage(page)
 	if Page.Parent ~= Menu then
 		GhostLib.Functions:Rgb(page.Button)
 		for _,page1 in pairs(GhostLib.Pages) do
-			if page1.Frame ~= Page then
-				GhostLib.Functions:RemoveRgb(page1.Button)
-				ts:Create(page1.Frame, TweenInfo.new(GhostLib.States.PageChangeTime, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0.443, 0,-1, 0)}):Play()
-				wait(GhostLib.States.PageChangeTime+0.05)
-				page1.Frame.Parent = nil
-				page1.Position = GhostLib.States.DefaultPagePos
-			end
+            coroutine.wrap(function()
+                if page1.Frame ~= Page then
+                    GhostLib.Functions:RemoveRgb(page1.Button)
+                    ts:Create(page1.Frame, TweenInfo.new(GhostLib.States.PageChangeTime, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(0.443, 0,-1, 0)}):Play()
+                   
+                    page1.Frame.Parent = nil
+                    page1.Position = GhostLib.States.DefaultPagePos
+                end
+            end)()
+			
 			
 			
 		end
+        wait(GhostLib.States.PageChangeTime+0.05)
 		Page.Position = UDim2.new(0.443, 0,1, 0)
 		Page.Parent = Menu
 		
