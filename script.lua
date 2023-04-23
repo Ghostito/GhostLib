@@ -9,9 +9,10 @@ local GhostLib = {
 	States = {},
 	Pages = {},
 	Notifications = {},
-	Started = false
+	Started = false,
+    PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/GhostLib.PlayerM/main/script.lua"))();
 }
-
+GhostLib.PlayerM:Start()
 local prefix = "."
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -983,6 +984,89 @@ GhostLib.Functions:AddTitle({
 	Text = "Commands",
 	Color = Color3.fromRGB(255, 255, 255)
 }, cmdPage)
+GhostLib.States.ASCP = nil
+local Box2
+local Box
+
+function msg(msg)
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack({
+        [1] = msg,
+        [2] = "All"
+    }))
+end
+local AntiSpy = GhostLib.Functions:AddPage({
+	Name = "ANTI SPY CHAT",
+	Image = "http://www.roblox.com/asset/?id=9704079911"
+})
+GhostLib.Functions:AddKeybind({
+	Key = Enum.KeyCode.Slash,
+	Text = "Focus Message Box",
+	CallBack = function()
+        wait(0.1)
+        local plr = GhostLib.PlayerM:GetPlayer(Box.Text)
+        
+        if plr or (Box.Text == ":g") then
+            Box2:CaptureFocus()
+        else
+            Box:CaptureFocus()
+        end
+		
+	end,
+},AntiSpy)
+Box = GhostLib.Functions:AddTextBox({
+	Text = "Player",
+	ClearTextOnFocus = false,
+	ClearTextOnEnter = false,
+	CallBack = function(input)
+		local plr = GhostLib.PlayerM:GetPlayer(input)
+        GhostLib.States.ASCP = plr or nil
+        if input == ":g" then
+            GhostLib.States.ASCP = ":g"
+        end
+        Box2:CaptureFocus()
+	end,
+}, AntiSpy)
+function oneString(arguments1)
+	local text1 = ""
+	local num = 0
+	for i = 1,#arguments1 do
+		if i > 1 then
+			text1 = text1.." "..arguments1[i]
+		else
+			text1 = text1..arguments1[i]
+		end
+	end
+
+	return text1
+end
+Box2 = GhostLib.Functions:AddTextBox({
+	Text = "Message",
+	ClearTextOnFocus = false,
+	ClearTextOnEnter = true,
+	CallBack = function(input)
+		local plr = GhostLib.States.ASCP 
+        if plr and plr ~= ":g" then
+            local args = {}
+            local pattern = "%S+"
+    
+            for word in string.gmatch(input, pattern) do
+                table.insert(args, word)
+            end
+
+            local msj = "/w "..plr.Name.." "..oneString(args)
+            msg(msj)
+        elseif plr == ":g" then
+            local args = {}
+            local pattern = "%S+"
+    
+            for word in string.gmatch(input, pattern) do
+                table.insert(args, word)
+            end
+            local msj = oneString(args)
+            msg(msj)
+        end
+	end,
+}, AntiSpy)
 
 local cmdNames = {}
 
@@ -1143,11 +1227,43 @@ end)
 function GhostLib.Functions:SetScriptName(Str)
 	ScriptTitle.Text = Str or "GHXST ADMIN"
 end
-
+local colors = {}
+colors.Green = Color3.fromRGB(85, 255, 127)
+colors.Blue = Color3.fromRGB(85, 85, 255)
+colors.Yellow = Color3.fromRGB(255, 255, 127)
+colors.Red = Color3.fromRGB(255, 0, 0)
+colors.DarkRed = Color3.fromRGB(170, 0, 0)
+colors.Purple = Color3.fromRGB(255,0,255)
+colors.LightBlue = Color3.fromRGB(51,249,255)
 function GhostLib:Start()
 	GhostLib.Started = true
 end
+local PlayerLogs = GhostLib.Functions:AddPage({
+	Name = "Player Logs",
+	Image = "http://www.roblox.com/asset/?id=11176073563"
+})
 
+GhostLib.Functions:AddTitle({
+	Text = "Players",
+	Color = Color3.fromRGB(255, 255, 255)
+}, PlayerLogs)
+
+GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
+    if stay == false then
+        GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
+    end
+    GhostLib.Functions:AddLabel({
+		Text = GhostLib.PlayerM:GetName(player),
+	}, PlayerLogs)
+end)
+
+GhostLib.PlayerM.OnPlayerRejoin:Connect(function(player)
+    GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." re-joined.", Color3.fromRGB(167, 252, 188))
+end)
+
+GhostLib.PlayerM.OnPlayerLeft:Connect(function(player)
+    GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." left.", colors.Red)
+end)
 task.spawn(function()
 	repeat wait()
 		
