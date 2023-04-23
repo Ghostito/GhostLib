@@ -10,11 +10,21 @@ local GhostLib = {
 	Pages = {},
 	Notifications = {},
 	Started = false,
-    PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/PlayerM/f3ceade450be71c1bda0f2f084df8f5c3fe24bcd/script.lua"))();
+    PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/PlayerM/main/script.lua"))();
 }
-GhostLib.PlayerM:Start()
-local prefix = "."
 
+local prefix = "."
+local colors = {}
+colors.Green = Color3.fromRGB(85, 255, 127)
+colors.Blue = Color3.fromRGB(85, 85, 255)
+colors.Yellow = Color3.fromRGB(255, 255, 127)
+colors.Red = Color3.fromRGB(255, 0, 0)
+colors.DarkRed = Color3.fromRGB(170, 0, 0)
+colors.Purple = Color3.fromRGB(255,0,255)
+colors.LightBlue = Color3.fromRGB(51,249,255)
+function GhostLib:Start()
+	GhostLib.Started = true
+end
 local ScreenGui = Instance.new("ScreenGui")
 local CommandBar = Instance.new("Frame")
 local CommandBox = Instance.new("TextBox")
@@ -137,8 +147,8 @@ function GhostLib.Functions:MakeNotification(Text, Color)
 				repeat wait()
 					MSG.DestroyTime = MSG.DestroyTime-1
 				until MSG.DestroyTime <= 0
-				ts:Create(newNotification.pos0, TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.In), {Position = pos2}):Play()
-				wait(1.05)
+				ts:Create(newNotification.pos0, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {Position = pos2}):Play()
+				wait(0.6)
 				newNotification:Destroy()
 			end
 		end)
@@ -451,11 +461,11 @@ UIGradient.Parent = Menu
 
 Output.Name = "Output"
 Output.Parent = ScreenGui
-Output.AnchorPoint = Vector2.new(0.5, 0.5)
+Output.AnchorPoint = Vector2.new(0,0)
 Output.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Output.BackgroundTransparency = 1.000
-Output.Position = UDim2.new(0.922506034, 0, 0.762962818, 0)
-Output.Size = UDim2.new(0.154655874, 0, 0.360493839, 0)
+Output.BackgroundTransparency = 1
+Output.Position = UDim2.new(0.9, 0,0.572, 0)
+Output.Size = UDim2.new(0, 190, 0, 227)
 
 UIListLayout_6.Parent = Output
 UIListLayout_6.SortOrder = Enum.SortOrder.LayoutOrder
@@ -464,7 +474,7 @@ NotificationFrame.Name = "NotificationFrame"
 NotificationFrame.Parent = nil
 NotificationFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 NotificationFrame.BackgroundTransparency = 1
-NotificationFrame.Size = UDim2.new(0.979, 0,0, 0)
+NotificationFrame.Size = UDim2.new(0, 190,0, 0)
 NotificationFrame.AutomaticSize = Enum.AutomaticSize.Y
 
 pos0.Name = "pos0"
@@ -472,11 +482,11 @@ pos0.Parent = NotificationFrame
 pos0.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 pos0.BackgroundTransparency = 1
 pos0.Position = UDim2.new(1.042, 0,0.142, 0)
-pos0.Size = UDim2.new(0, 160, 0, 0)
+pos0.Size = UDim2.new(0, 190, 0, 0)
 pos0.Font = Enum.Font.DenkOne
 pos0.Text = ""
 pos0.TextColor3 = Color3.fromRGB(255, 255, 255)
-pos0.TextSize = 16.000
+pos0.TextSize = 15.000
 pos0.TextStrokeTransparency = 0.5
 pos0.TextWrapped = true
 pos0.TextXAlignment = Enum.TextXAlignment.Left
@@ -486,13 +496,13 @@ pos1.Name = "pos1"
 pos1.Parent = NotificationFrame
 pos1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 pos1.BackgroundTransparency = 1
-pos1.Position = UDim2.new(0.042, 0,0.142, 0)
-pos1.Size = UDim2.new(0, 160, 0, 0)
+pos1.Position = UDim2.new(-0.02, 0,0.142, 0)
+pos1.Size = UDim2.new(0, 190, 0, 0)
 pos1.Visible = false
 pos1.Font = Enum.Font.DenkOne
 pos1.Text = ""
 pos1.TextColor3 = Color3.fromRGB(255, 255, 255)
-pos1.TextSize = 16.000
+pos1.TextSize = 15.000
 pos1.TextStrokeTransparency = 0.730
 pos1.TextWrapped = true
 pos1.TextXAlignment = Enum.TextXAlignment.Left
@@ -549,7 +559,6 @@ function GhostLib.Functions:RemoveRgb(frame)
 		for i,f in pairs(savedColors) do
 			if f[1] == frame then
 				frame.BackgroundColor3 = f[2]
-				print(f[2])
 			end
 		end
 	end)()
@@ -928,7 +937,7 @@ function GhostLib.Functions:AddLabel(tab, page)
 	local Color = tab.Color or Color3.fromRGB(255, 255, 255)
 	local label = Label:Clone()
 	label.Text = Text
-	label.TextColor3 = Color 
+	label.TextColor3 = Color
 	label.Parent = page.Frame
 end
 function GhostLib.Functions:AddTitle(tab, page)
@@ -998,6 +1007,8 @@ local AntiSpy = GhostLib.Functions:AddPage({
 	Name = "ANTI SPY CHAT",
 	Image = "http://www.roblox.com/asset/?id=9704079911"
 })
+
+
 GhostLib.Functions:AddKeybind({
 	Key = Enum.KeyCode.Slash,
 	Text = "Focus Message Box",
@@ -1013,6 +1024,7 @@ GhostLib.Functions:AddKeybind({
 		
 	end,
 },AntiSpy)
+
 Box = GhostLib.Functions:AddTextBox({
 	Text = "Player",
 	ClearTextOnFocus = false,
@@ -1184,7 +1196,7 @@ local function execute_command(tab)
                     if func then
                         executed = executed+1
                         local sucess, err = pcall(func, cmd)
-                        if err then print(err) end
+                        --if err then print(err) end
                     end
                 end
     
@@ -1200,14 +1212,6 @@ local function execute_command(tab)
 	
 end
 
-GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
-    if stay == false then
-        GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
-    end
-    GhostLib.Functions:AddLabel({
-		Text = GhostLib.PlayerM:GetName(player),
-	}, PlayerLogs)
-end)
 
 
 lp.Chatted:connect(function(msg)
@@ -1224,6 +1228,24 @@ GhostLib.Functions:AddCommand({Names = {"rj", "rejoin"}, Description = {"string"
 	game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
 end})
 
+local PlayerLogs = GhostLib.Functions:AddPage({
+	Name = "Player Logs",
+	Image = "http://www.roblox.com/asset/?id=11176073563"
+})
+GhostLib.Functions:AddTitle({
+	Text = "Players",
+	Color = Color3.fromRGB(255, 255, 255)
+}, PlayerLogs)
+
+GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
+    if stay == false then
+        GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
+    end
+    GhostLib.Functions:AddLabel({
+		Text = GhostLib.PlayerM:GetName(player),
+	}, PlayerLogs)
+end)
+
 GhostLib.Functions:DisplayPage(GhostLib.Pages[1])
 
 CommandBox.FocusLost:Connect(function(enter)
@@ -1238,26 +1260,8 @@ end)
 function GhostLib.Functions:SetScriptName(Str)
 	ScriptTitle.Text = Str or "GHXST ADMIN"
 end
-local colors = {}
-colors.Green = Color3.fromRGB(85, 255, 127)
-colors.Blue = Color3.fromRGB(85, 85, 255)
-colors.Yellow = Color3.fromRGB(255, 255, 127)
-colors.Red = Color3.fromRGB(255, 0, 0)
-colors.DarkRed = Color3.fromRGB(170, 0, 0)
-colors.Purple = Color3.fromRGB(255,0,255)
-colors.LightBlue = Color3.fromRGB(51,249,255)
-function GhostLib:Start()
-	GhostLib.Started = true
-end
-local PlayerLogs = GhostLib.Functions:AddPage({
-	Name = "Player Logs",
-	Image = "http://www.roblox.com/asset/?id=11176073563"
-})
 
-GhostLib.Functions:AddTitle({
-	Text = "Players",
-	Color = Color3.fromRGB(255, 255, 255)
-}, PlayerLogs)
+
 
 GhostLib.PlayerM.OnPlayerRejoin:Connect(function(player)
     GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." re-joined.", Color3.fromRGB(167, 252, 188))
@@ -1266,12 +1270,13 @@ end)
 GhostLib.PlayerM.OnPlayerLeft:Connect(function(player)
     GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." left.", colors.Red)
 end)
-task.spawn(function()
+
+coroutine.wrap(function()
 	repeat wait()
 		
 	until GhostLib.Started == true
 	Menu.Visible = true
-end)
+end)()
+
+GhostLib.PlayerM:Start()
 return GhostLib
-
-
