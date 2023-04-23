@@ -12,7 +12,7 @@ local GhostLib = {
 	Started = false,
     PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/PlayerM/f3ceade450be71c1bda0f2f084df8f5c3fe24bcd/script.lua"))();
 }
-
+GhostLib.PlayerM:Start()
 local prefix = "."
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -1208,7 +1208,7 @@ GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
 		Text = GhostLib.PlayerM:GetName(player),
 	}, PlayerLogs)
 end)
-GhostLib.PlayerM:Start()
+
 
 lp.Chatted:connect(function(msg)
 	execute_command({str = msg, method = "chatted"})
