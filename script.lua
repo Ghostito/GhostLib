@@ -10,7 +10,7 @@ local GhostLib = {
 	Pages = {},
 	Notifications = {},
 	Started = false,
-    PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/GhostLib.PlayerM/main/script.lua"))();
+    PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/PlayerM/main/script.lua"))();
 }
 GhostLib.PlayerM:Start()
 local prefix = "."
