@@ -12,7 +12,7 @@ local GhostLib = {
 	Started = false,
     PlayerM = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ghostito/PlayerM/f3ceade450be71c1bda0f2f084df8f5c3fe24bcd/script.lua"))();
 }
-GhostLib.PlayerM:Start()
+
 local prefix = "."
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -1199,6 +1199,17 @@ local function execute_command(tab)
 	
 	
 end
+
+GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
+    if stay == false then
+        GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
+    end
+    GhostLib.Functions:AddLabel({
+		Text = GhostLib.PlayerM:GetName(player),
+	}, PlayerLogs)
+end)
+GhostLib.PlayerM:Start()
+
 lp.Chatted:connect(function(msg)
 	execute_command({str = msg, method = "chatted"})
 end)
@@ -1247,16 +1258,6 @@ GhostLib.Functions:AddTitle({
 	Text = "Players",
 	Color = Color3.fromRGB(255, 255, 255)
 }, PlayerLogs)
-
-GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
-    print(player)
-    if stay == false then
-        GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
-    end
-    GhostLib.Functions:AddLabel({
-		Text = GhostLib.PlayerM:GetName(player),
-	}, PlayerLogs)
-end)
 
 GhostLib.PlayerM.OnPlayerRejoin:Connect(function(player)
     GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." re-joined.", Color3.fromRGB(167, 252, 188))
