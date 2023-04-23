@@ -1261,7 +1261,46 @@ function GhostLib.Functions:SetScriptName(Str)
 	ScriptTitle.Text = Str or "GHXST ADMIN"
 end
 
+function GhostLib.States:SetState(state, arg)
+	if not state or not arg then return end
+	local stateusing = string.upper(state)
 
+		if arg == "on" then
+			if GhostLib.States[stateusing] == true then
+				GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": already enabled", colors.Red, "error")
+				return false
+			else
+				GhostLib.States[stateusing] = true
+				GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": enabled", colors.Green)
+				return true
+			end
+		else
+			if arg == "off" then
+				if GhostLib.States[stateusing] == false then
+					GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": already disabled", colors.Red, "error")
+					return false
+				else
+					GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": disabled", colors.Green)
+					GhostLib.States[stateusing] = false
+					return true
+				end
+			else
+				if not arg then
+					if GhostLib.States[stateusing] == false or GhostLib.States[stateusing] == nil or not GhostLib.States[stateusing] then
+						GhostLib.States[stateusing] = true
+						GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": enabled", colors.Green)
+						return true
+					else
+						if GhostLib.States[stateusing] == true then
+							GhostLib.Functions:MakeNotification(mayusfirst(stateusing)..": disabled", colors.Green)
+							GhostLib.States[stateusing] = false
+							return true
+						end
+					end
+				end
+			end
+		end
+end
 
 GhostLib.PlayerM.OnPlayerRejoin:Connect(function(player)
     GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." re-joined.", Color3.fromRGB(167, 252, 188))
