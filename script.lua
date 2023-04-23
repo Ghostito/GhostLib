@@ -1249,6 +1249,7 @@ GhostLib.Functions:AddTitle({
 }, PlayerLogs)
 
 GhostLib.PlayerM.OnPlayerFirstJoin:Connect(function(player, stay)
+    print(player)
     if stay == false then
         GhostLib.Functions:MakeNotification(GhostLib.PlayerM:GetName(player).." joined", colors.Green)
     end
