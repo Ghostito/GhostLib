@@ -1170,7 +1170,7 @@ local function execute_command(tab)
                     foundPrefix = true
     
                     table.insert(CommandsFound, arg)
-                elseif table.find(cmdNames, arg) and method == "bar" then
+                elseif table.find(cmdNames, arg) and method == "bar" and index == 1 then
                     foundPrefix = true
     
                     table.insert(CommandsFound, arg)
