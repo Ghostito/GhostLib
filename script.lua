@@ -1260,7 +1260,16 @@ end)
 function GhostLib.Functions:SetScriptName(Str)
 	ScriptTitle.Text = Str or "GHXST ADMIN"
 end
+function removeguion(string1)
+	local str = string1
+	local newStr, replaced = string.gsub(str, "_", " ")
+	return newStr
+end
 
+function mayusfirst(str)
+	local string1 = string.lower(str)
+	return removeguion((string1:gsub("^%l", string.upper)))
+end
 function GhostLib.States:SetState(state, arg)
 	if not state or not arg then return end
 	local stateusing = string.upper(state)
