@@ -1150,8 +1150,8 @@ local function getcmdfunction(str)
 	return found
 end
 
-local function execute_command(tab)
-    task.spawn(function()
+function GhostLib.Functions:Execute_command(tab)
+	task.spawn(function()
         if GhostLib.Started == true then
             local str = tab.str
             local method = tab.method or "bar"
@@ -1218,15 +1218,13 @@ local function execute_command(tab)
             end
         end
     end)
-	
-	
-	
 end
 
 
 
+
 lp.Chatted:connect(function(msg)
-	execute_command({str = msg, method = "chatted"})
+	GhostLib.Functions:Execute_command({str = msg, method = "chatted"})
 end)
 
 GhostLib.Functions:AddCommand({Names = {"changeprefix", "prefix", "pfx"}, Description = {"string"}, Funct = function(args)
@@ -1261,7 +1259,7 @@ GhostLib.Functions:DisplayPage(GhostLib.Pages[1])
 
 CommandBox.FocusLost:Connect(function(enter)
 	if enter then
-		execute_command({str = CommandBox.Text, method = "bar"})
+		GhostLib.Functions:Execute_command({str = CommandBox.Text, method = "bar"})
 		CommandBox.Text = ""
 	end
 	
