@@ -1,4 +1,5 @@
-
+local NOTLOAD = true
+if NOTLOAD == true then return end
 local Players = game:GetService("Players")
 local ts = game:GetService("TweenService")
 local lp = Players.LocalPlayer
@@ -975,6 +976,17 @@ GhostLib.Functions:AddKeybind({
 },cmdPage)
 
 GhostLib.Functions:AddKeybind({
+	Key = Enum.KeyCode.P,
+	Text = "Open/Close output",
+	CallBack = function()
+		Output.Visible = not Output.Visible
+		if Output.Visible == true then
+			GhostLib.Functions:MakeNotification("Output enabled", colors.Green)
+		end
+		
+	end,
+},cmdPage)
+GhostLib.Functions:AddKeybind({
 	Key = Enum.KeyCode.K,
 	Text = "Open menu",
 	CallBack = function()
@@ -1010,7 +1022,7 @@ local AntiSpy = GhostLib.Functions:AddPage({
 
 
 GhostLib.Functions:AddKeybind({
-	Key = Enum.KeyCode.Slash,
+	Key = Enum.KeyCode.Minus,
 	Text = "Focus Message Box",
 	CallBack = function()
         wait(0.1)
@@ -1203,7 +1215,7 @@ local function execute_command(tab)
     
             end
             if executed == 0 then
-                print("Commands not found")
+                GhostLib.Functions:MakeNotification("No command found.", colors.Red)
             end
         end
     end)
