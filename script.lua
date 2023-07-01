@@ -1,5 +1,4 @@
-local NOTLOAD = true
-if NOTLOAD == true then return end
+
 local Players = game:GetService("Players")
 local ts = game:GetService("TweenService")
 local lp = Players.LocalPlayer
